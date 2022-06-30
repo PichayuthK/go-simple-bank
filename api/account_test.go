@@ -20,11 +20,13 @@ func TestGetAccount(t *testing.T) {
 	defer ctrl.Finish()
 
 	store := mockdb.NewMockStore(ctrl)
+	// build stubs
 	store.EXPECT().
 		GetAccount(gomock.Any(), gomock.Eq(account.ID)).
 		Times(1).
 		Return(account, nil)
 
+	// start test server and send request
 	server := NewServer(store)
 	recorder := httptest.NewRecorder()
 
@@ -33,6 +35,8 @@ func TestGetAccount(t *testing.T) {
 	require.NoError(t, err)
 
 	server.router.ServeHTTP(recorder, request)
+	// check response
+	require.Equal(t, http.StatusOK, recorder.Code)
 }
 
 func randomAccount() db.Account {
